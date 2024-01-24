@@ -17,6 +17,9 @@ const fillCard = (data, template) => {
     output = output.replace(/{%PRICE%}/g, data.price);
     output = output.replace(/{%QUANTITY%}/g, data.quantity);
     output = output.replace(/{%ID%}/g, data.id);
+    output = output.replace(/{%FROM%}/g, data.from);
+    output = output.replace(/{%NUTRIENTS%}/g, data.nutrients);
+    output = output.replace(/{%DESCRIPTION%}/g, data.description);
 
     if (data.organic === false)
         output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic')
@@ -25,8 +28,12 @@ const fillCard = (data, template) => {
 }
 
 const server =  http.createServer((req, res) => {
-    const pathName = req.url;
+    const completeUrl = `http://${req.headers.host}${req.url}`;
+    const url = new URL(completeUrl);
+    const pathName = url.pathname || '/';
+    const productID = url.searchParams.get('id');
 
+    console.log(pathName);
     if (pathName === '/' || pathName === '/overview') {
         res.writeHead(200, {'Content-type': 'text/html'});
 
@@ -34,8 +41,12 @@ const server =  http.createServer((req, res) => {
         const output = overview_template.replace(/{%PRODUCT_CARDS%}/g, cardsHTML);
         res.end(output);
     }
-    else if (pathName === '/products') {
-        res.end(`Welcome to PRODUCTS page`)
+    else if (pathName === `/product`) {
+        res.writeHead(200, {'Content-type': 'text/html'});
+
+        const product = productsDataObj[productID];
+        const output = fillCard(product, product_template);
+        res.end(output)
     }
     else if (pathName === '/api') {
             res.writeHead(200, {'Content-type' : 'application/json'});
