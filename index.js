@@ -32,6 +32,8 @@ var server = http.createServer(function (req, res) {
     var url = new URL(completeUrl);
     var pathName = url.pathname || '/';
     var productID = url.searchParams.get('id');
+    var oh = 'wow';
+    var oh2 = 'wow';
     // Handle different routes
     if (pathName === '/' || pathName === '/overview') {
         // Send the overview page
@@ -45,6 +47,8 @@ var server = http.createServer(function (req, res) {
         // Send the product page
         res.writeHead(200, { 'Content-type': 'text/html' });
         // Get the requested product and generate the product page HTML
+        if (productID === null)
+            productID = '0';
         var product = productsDataObj[productID];
         var output = fillCard(product, product_template);
         res.end(output);
